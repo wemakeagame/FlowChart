@@ -1,0 +1,20 @@
+<div class="container">
+  <div class="element" *ngFor="let el of _content">
+    <div class="inner-content" #innerContent id="el-{{el.index}}">
+      <span>{{el.content}}</span>
+    </div>
+  </div>
+
+  <svg *ngFor="let el of _content" class="arrow" width="auto" height="auto">
+    <line
+      #arrow
+      *ngIf="el.nextId"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="0"
+      stroke="black"
+      id="arrow-{{el.index}}"
+    />
+  </svg>
+</div>

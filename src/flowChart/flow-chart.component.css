@@ -1,0 +1,19 @@
+.element {
+  position: absolute;
+  min-width: 150px;
+  min-height: 50px;
+  border: 1px dotted #cccccc;
+}
+
+.element .inner-content {
+  display: flex;
+  height: 50px;
+}
+
+.element .inner-content span {
+  margin: auto;
+}
+
+.arrow {
+  position: absolute;
+}
