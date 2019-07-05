@@ -3,11 +3,70 @@
   min-width: 150px;
   min-height: 50px;
   border: 1px dotted #cccccc;
+  background-color: #fefefe;
+  z-index: 5;
+  cursor: pointer;
+}
+
+.container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.arrows {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.wrapper {
+  overflow: hidden;
+  background-color: #bebebe;
+}
+
+.container.horizontal .element.has-children::after {
+  content: "";
+  width: 0;
+  height: 0;
+  position: absolute;
+  justify-self: center;
+  right: -10px;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  border-top: 5px solid transparent;
+  border-right: 10px solid black;
+  border-bottom: 5px solid transparent;
+}
+
+.container.vertical .element.has-children::after {
+  content: "";
+  width: 0;
+  height: 0;
+  position: absolute;
+  justify-self: center;
+  bottom: -10px;
+  left: 0;
+  right: 0;
+  margin: auto;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 10px solid black;
 }
 
 .element .inner-content {
   display: flex;
   height: 50px;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none;
 }
 
 .element .inner-content span {
@@ -16,4 +75,10 @@
 
 .arrow {
   position: absolute;
+}
+
+.chart {
+  overflow: hidden;
+  max-width: 100%;
+  max-height: 100%;
 }

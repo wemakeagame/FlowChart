@@ -6,7 +6,8 @@ import {
   OnChanges,
   SimpleChanges,
   ViewChildren,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  ViewChild
 } from "@angular/core";
 import { ChartElement } from "./chart.element.interface";
 
@@ -20,18 +21,23 @@ export class FlowChartComponent implements OnChanges {
   @Input() withEl: number;
   @Input() heightEl: number;
   @Input() dinstanceElHorizontal = 40;
-  @Input() dinstanceElVertical = 80;
-  @Input() direction = "horizontal"; // horizontal | vertical
+  @Input() dinstanceElVertical = 50;
+  @Input() direction = "vertical"; // horizontal | vertical
   @Input() adjustOnChange = true;
+  @Input() canvasWidth = 1500;
+  @Input() canvasHeight = 500;
 
   private _content: ChartElement[];
-  private initPos = 10;
+  private initPos = 0;
+  private arrowSize = 10;
 
   @Output() onAddElement = new EventEmitter();
   @Output() onRemoveElement = new EventEmitter();
 
   @ViewChildren("innerContent") templateContents;
   @ViewChildren("arrow") arrows;
+  @ViewChild("container") container;
+  @ViewChild("arrowsContainer") arrowsContainer;
 
   constructor(private cd: ChangeDetectorRef) {}
 
@@ -39,6 +45,18 @@ export class FlowChartComponent implements OnChanges {
     this.setupChart();
 
     setTimeout(() => {
+      this.container.nativeElement.parentNode.style.height =
+        this.canvasHeight + "px";
+      this.container.nativeElement.parentNode.style.width =
+        this.canvasWidth + "px";
+
+      this.arrowsContainer.nativeElement.style.height =
+        this.canvasHeight + "px";
+      this.arrowsContainer.nativeElement.style.width = this.canvasWidth + "px";
+      this.initPos =
+        this.container.nativeElement[
+          this.direction === "horizontal" ? "clientHeight" : "clientWidth"
+        ] / 2;
       this.setPositions();
     }, 100);
   }
@@ -65,43 +83,115 @@ export class FlowChartComponent implements OnChanges {
     });
   }
 
-  setPositions() {
+  setPositions(hasToInit = true) {
     const els = this.templateContents["_results"] || [];
     const arrows = this.arrows["_results"] || [];
     let pos = this.initPos;
 
-    els.forEach(element => {
-      const domEl = element["nativeElement"];
-      const ref = this._content[+domEl.id.replace("el-", "")];
+    if (hasToInit) {
+      //set sizes
+      els.forEach(element => {
+        const domEl = element["nativeElement"];
+        const ref = this._content[+domEl.id.replace("el-", "")];
 
-      ref.width = domEl.offsetWidth + (this.withEl || 0);
-      ref.height = domEl.offsetHeight + (this.heightEl || 0);
+        ref.width = domEl.offsetWidth + (this.withEl || 0);
+        ref.height = domEl.offsetHeight + (this.heightEl || 0);
+      });
 
-      if (ref.parent) {
-        ref.posX =
-          ref.parent.posX + this.dinstanceElHorizontal + ref.parent.width;
-        ref.posY =
-          ref.parent.posY -
-          ((ref.parent.children.length - 1) * this.dinstanceElVertical) / 2 +
-          ref.childIndex * this.dinstanceElVertical;
-      } else {
-        ref.posX = pos;
-        ref.posY = pos + this.dinstanceElVertical;
-      }
+      els.forEach(element => {
+        const domEl = element["nativeElement"];
+        const ref = this._content[+domEl.id.replace("el-", "")];
 
-      domEl.parentNode.style.left = ref.posX + "px";
-      domEl.parentNode.style.top = ref.posY + "px";
-    });
+        if (ref.parent) {
+          if (this.direction === "horizontal") {
+            let dis = -ref.height;
+            ref.parent.children.forEach((e, i) => {
+              dis += e.height + (i ? this.dinstanceElVertical : 0);
+            });
+            dis *= ref.childIndex - 0.5;
+
+            ref.posX =
+              ref.parent.posX + this.dinstanceElHorizontal + ref.parent.width;
+            ref.posY = ref.parent.posY + dis;
+          } else {
+            let dis = -ref.width;
+            ref.parent.children.forEach((e, i) => {
+              dis += e.width + (i ? this.dinstanceElHorizontal : 0);
+            });
+            dis *= ref.childIndex - 0.5;
+
+            ref.posY =
+              ref.parent.posY + this.dinstanceElVertical + ref.parent.height;
+            ref.posX = ref.parent.posX + dis;
+          }
+        } else {
+          if (this.direction === "horizontal") {
+            ref.posX = this.dinstanceElVertical;
+            ref.posY = pos + ref.height / 2;
+          } else {
+            ref.posY = this.dinstanceElHorizontal;
+            ref.posX = pos + ref.width / 2;
+          }
+        }
+
+        domEl.parentNode.style.left = ref.posX + "px";
+        domEl.parentNode.style.top = ref.posY + "px";
+      });
+    }
 
     arrows.forEach(arrow => {
       const domEl = arrow["nativeElement"];
       const ref = this._content[+domEl.id.replace("arrow-", "")];
+      domEl.setAttribute(
+        "x1",
+        this.container.nativeElement.offsetLeft + ref.posX + ref.width / 2
+      );
+      domEl.setAttribute(
+        "y1",
+        this.container.nativeElement.offsetTop + ref.posY + ref.height / 2
+      );
+      domEl.parentNode.style.width = this.canvasWidth * 100 + "px";
+      domEl.parentNode.style.height = this.canvasHeight * 100 + "px";
 
-      domEl.setAttribute("x1", ref.posX);
-      domEl.setAttribute("y1", ref.posY + ref.height / 2);
-
-      domEl.setAttribute("x2", ref.parent.posX + ref.parent.width);
-      domEl.setAttribute("y2", ref.parent.posY + ref.parent.height / 2);
+      if (this.direction === "horizontal") {
+        domEl.setAttribute(
+          "x2",
+          this.container.nativeElement.offsetLeft +
+            ref.parent.posX +
+            ref.parent.width +
+            this.arrowSize
+        );
+        domEl.setAttribute(
+          "y2",
+          this.container.nativeElement.offsetTop +
+            ref.parent.posY +
+            ref.parent.height / 2
+        );
+      } else {
+        domEl.setAttribute(
+          "y2",
+          this.container.nativeElement.offsetTop +
+            ref.parent.posY +
+            ref.parent.height +
+            this.arrowSize
+        );
+        domEl.setAttribute(
+          "x2",
+          this.container.nativeElement.offsetLeft +
+            ref.parent.posX +
+            ref.parent.width / 2
+        );
+      }
     });
+  }
+
+  onDropElement(event) {
+    if (event) {
+      const id = event.target.id || event.target.children[0].id;
+      let ref = this._content[+id.replace("el-", "")];
+      ref.posX = event.left;
+      ref.posY = event.top;
+    }
+    this.setPositions(false);
   }
 }

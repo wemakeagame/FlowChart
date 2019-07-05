@@ -2,12 +2,11 @@ import { BrowserModule } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
 
 import { AppComponent } from "./app.component";
-import { FlowChartComponent } from "../flowChart/flow-chart.component";
+import { FlowChartModule } from "../flowChart/flow-chart.module";
 
 @NgModule({
-  declarations: [AppComponent, FlowChartComponent],
-  imports: [BrowserModule],
-  providers: [],
+  declarations: [AppComponent],
+  imports: [BrowserModule, FlowChartModule],
   bootstrap: [AppComponent]
 })
 export class AppModule {}
