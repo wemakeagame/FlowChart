@@ -28,34 +28,49 @@
   background-color: #bebebe;
 }
 
-.container.horizontal .element.has-children::after {
+.container .element.has-children::after {
   content: "";
   width: 0;
   height: 0;
   position: absolute;
   justify-self: center;
+  margin: auto;
+}
+
+.container.horizontal .element.has-children.flow1::after {
   right: -10px;
   top: 0;
   bottom: 0;
-  margin: auto;
   border-top: 5px solid transparent;
   border-right: 10px solid black;
   border-bottom: 5px solid transparent;
 }
 
-.container.vertical .element.has-children::after {
-  content: "";
-  width: 0;
-  height: 0;
-  position: absolute;
-  justify-self: center;
+.container.horizontal .element.has-children:not(.flow1)::after {
+  left: -10px;
+  top: 0;
+  bottom: 0;
+  border-top: 5px solid transparent;
+  border-left: 10px solid black;
+  border-bottom: 5px solid transparent;
+}
+
+.container.vertical .element.has-children.flow1::after {
   bottom: -10px;
   left: 0;
   right: 0;
-  margin: auto;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
   border-bottom: 10px solid black;
+}
+
+.container.vertical .element.has-children:not(.flow1)::after {
+  top: -10px;
+  left: 0;
+  right: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 10px solid black;
 }
 
 .element .inner-content {
@@ -77,8 +92,7 @@
   position: absolute;
 }
 
-.chart {
-  overflow: hidden;
-  max-width: 100%;
-  max-height: 100%;
+:host {
+  height: 100% !important;
+  display: block !important;
 }

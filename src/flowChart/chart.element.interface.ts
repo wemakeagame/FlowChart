@@ -10,6 +10,7 @@ export interface ChartElement {
   childIndex?: number;
   width?: number;
   height?: number;
+  flowDirection?: number;
 }
 
 export interface ChartPoints {

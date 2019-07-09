@@ -23,9 +23,11 @@ export class FlowChartComponent implements OnChanges {
   @Input() dinstanceElHorizontal = 40;
   @Input() dinstanceElVertical = 50;
   @Input() direction = "vertical"; // horizontal | vertical
+  @Input() flowDirection = 2;
   @Input() adjustOnChange = true;
-  @Input() canvasWidth = 1500;
-  @Input() canvasHeight = 500;
+  @Input() canvasWidth = 500;
+  @Input() canvasHeight: any = 500;
+  @Input() autoResize = true;
 
   private _content: ChartElement[];
   private initPos = 0;
@@ -45,13 +47,18 @@ export class FlowChartComponent implements OnChanges {
     this.setupChart();
 
     setTimeout(() => {
+      if (this.autoResize) {
+        const comp = this.container.nativeElement;
+        this.canvasWidth = comp.clientWidth;
+        this.canvasHeight = "100";
+      }
       this.container.nativeElement.parentNode.style.height =
-        this.canvasHeight + "px";
+        this.canvasHeight + (this.autoResize ? "%" : "px");
       this.container.nativeElement.parentNode.style.width =
         this.canvasWidth + "px";
 
       this.arrowsContainer.nativeElement.style.height =
-        this.canvasHeight + "px";
+        this.canvasHeight + (this.autoResize ? "%" : "px");
       this.arrowsContainer.nativeElement.style.width = this.canvasWidth + "px";
       this.initPos =
         this.container.nativeElement[
@@ -87,6 +94,7 @@ export class FlowChartComponent implements OnChanges {
     const els = this.templateContents["_results"] || [];
     const arrows = this.arrows["_results"] || [];
     let pos = this.initPos;
+    const self = this;
 
     if (hasToInit) {
       //set sizes
@@ -141,7 +149,14 @@ export class FlowChartComponent implements OnChanges {
 
     arrows.forEach(arrow => {
       const domEl = arrow["nativeElement"];
-      const ref = this._content[+domEl.id.replace("arrow-", "")];
+      const refEl = this._content[+domEl.id.replace("arrow-", "")];
+      let ref = { ...refEl };
+      if (self.flowDirection !== 1) {
+        let p = { ...ref.parent };
+        ref = p;
+        ref.parent = { ...refEl };
+      }
+
       domEl.setAttribute(
         "x1",
         this.container.nativeElement.offsetLeft + ref.posX + ref.width / 2
@@ -158,7 +173,9 @@ export class FlowChartComponent implements OnChanges {
           "x2",
           this.container.nativeElement.offsetLeft +
             ref.parent.posX +
-            ref.parent.width +
+            (self.flowDirection !== 1
+              ? -this.arrowSize * 2
+              : ref.parent.width) +
             this.arrowSize
         );
         domEl.setAttribute(
@@ -172,7 +189,9 @@ export class FlowChartComponent implements OnChanges {
           "y2",
           this.container.nativeElement.offsetTop +
             ref.parent.posY +
-            ref.parent.height +
+            (self.flowDirection !== 1
+              ? -this.arrowSize * 2
+              : ref.parent.height) +
             this.arrowSize
         );
         domEl.setAttribute(

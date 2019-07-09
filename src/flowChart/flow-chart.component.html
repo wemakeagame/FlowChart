@@ -1,9 +1,13 @@
 <div class="wrapper" dragndrop (onDrop)="onDropElement($event)">
-  <div class="container" [ngClass]="direction" #container>
+  <div
+    class="container"
+    [ngClass]="{'horizontal':direction == 'horizontal','vertical':direction == 'vertical', 'flow1':flowDirection==1}"
+    #container
+  >
     <div
       class="element"
       *ngFor="let el of _content"
-      [ngClass]="{'has-children': el.children?.length}"
+      [ngClass]="{'has-children': el.children?.length && flowDirection == 1 || (flowDirection != 1 && el.parent), 'flow1': flowDirection==1}"
     >
       <div class="inner-content" #innerContent id="el-{{el.index}}">
         <span>{{el.content}}</span>
