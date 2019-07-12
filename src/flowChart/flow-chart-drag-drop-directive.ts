@@ -1,4 +1,10 @@
-import { Directive, HostListener, Output, EventEmitter } from "@angular/core";
+import {
+  Directive,
+  HostListener,
+  Input,
+  Output,
+  EventEmitter
+} from "@angular/core";
 
 @Directive({ selector: "[dragndrop]" })
 export class DragNDrop {
@@ -8,6 +14,8 @@ export class DragNDrop {
   private _container = null;
   private posContainer = { x: 0, y: 0 };
   private posClickContainer = { x: 0, y: 0 };
+  @Input() maxZoom = 2;
+  private currentZoom = 1;
 
   @HostListener("mousedown", ["$event"]) onMouseDown(e) {
     const target = e.target;
@@ -71,26 +79,29 @@ export class DragNDrop {
       if (!this._container) {
         this._container = this.target.parentNode;
       }
-      this.target.style.top =
-        event.clientY -
-        this.target.offsetHeight / 2 -
-        this._container.offsetTop +
-        "px";
-      this.target.style.left =
-        event.clientX -
+      let posY =
+        event.clientY / this.currentZoom -
+        this.target.offsetHeight / 2 +
+        (this.currentZoom !== 1
+          ? (this.target.offsetHeight / 2) * this.currentZoom
+          : 0) -
+        this._container.offsetTop -
+        this._container.parentNode.offsetTop;
+      let posX =
+        event.clientX / this.currentZoom -
         this.target.offsetWidth / 2 -
-        this._container.offsetLeft +
-        "px";
+        this._container.offsetLeft -
+        this._container.parentNode.offsetLeft;
+
+      console.log(this.target.offsetHeight);
+      console.log(this.target.offsetWidth);
+
+      this.target.style.top = posY + "px";
+      this.target.style.left = posX + "px";
 
       this.onDrop.emit({
-        top:
-          event.clientY -
-          this.target.offsetHeight / 2 -
-          this._container.offsetTop,
-        left:
-          event.clientX -
-          this.target.offsetWidth / 2 -
-          this._container.offsetLeft,
+        top: posY,
+        left: posX,
         target: this.target
       });
     }
@@ -101,6 +112,30 @@ export class DragNDrop {
       this.container.style.left =
         event.clientX - this.posClickContainer.x + this.posContainer.x + "px";
       this.onDrop.emit();
+    }
+  }
+
+  @HostListener("mousewheel", ["$event"]) onWheelScrool(event) {
+    if (this._container) {
+      const items = this._container.parentNode.children[0];
+      const arrows = this._container.parentNode.children[1];
+
+      if (event.wheelDelta > 0) {
+        this.currentZoom += 0.1;
+      } else {
+        this.currentZoom -= 0.1;
+      }
+
+      if (this.currentZoom > this.maxZoom) {
+        this.currentZoom = this.maxZoom;
+      }
+
+      if (this.currentZoom < 1) {
+        this.currentZoom = 1;
+      }
+
+      items.style.zoom = this.currentZoom;
+      arrows.style.zoom = this.currentZoom;
     }
   }
 }

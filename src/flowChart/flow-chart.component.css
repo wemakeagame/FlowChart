@@ -26,6 +26,7 @@
 .wrapper {
   overflow: hidden;
   background-color: #bebebe;
+  position: relative;
 }
 
 .container .element.has-children::after {
@@ -95,4 +96,9 @@
 :host {
   height: 100% !important;
   display: block !important;
+}
+
+:host /deep/ flow-chart .wrapper {
+  min-height: 15vh;
+  zoom: 0.1;
 }

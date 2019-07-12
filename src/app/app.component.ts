@@ -7,6 +7,8 @@ import { ChartElement } from "../flowChart/chart.element.interface";
   styleUrls: ["./app.component.css"]
 })
 export class AppComponent {
+  flow = 1;
+  direction = "horizontal";
   contentChart: ChartElement[] = [
     {
       id: 1,
@@ -43,4 +45,13 @@ export class AppComponent {
       nextId: 2
     }
   ];
+
+  toggleDirection() {
+    this.direction =
+      this.direction === "horizontal" ? "vertical" : "horizontal";
+  }
+
+  toggleFlow() {
+    this.flow = this.flow === 1 ? 2 : 1;
+  }
 }

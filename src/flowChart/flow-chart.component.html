@@ -10,7 +10,7 @@
       [ngClass]="{'has-children': el.children?.length && flowDirection == 1 || (flowDirection != 1 && el.parent), 'flow1': flowDirection==1}"
     >
       <div class="inner-content" #innerContent id="el-{{el.index}}">
-        <span>{{el.content}}</span>
+        <span>{{el.content}} </span>
       </div>
     </div>
   </div>

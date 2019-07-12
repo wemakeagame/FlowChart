@@ -1,3 +1,11 @@
-<div class="chart" style="height:100vh">
-  <flow-chart [content]="contentChart"></flow-chart>
+<div style="margin: 50px">
+  <button (click)="toggleDirection()">Toggle Direction ({{direction}})</button>
+  <button (click)="toggleFlow()">Toggle Flow ({{flow}})</button>
+</div>
+<div class="chart" style="height:80vh">
+  <flow-chart
+    [content]="contentChart"
+    [direction]="direction"
+    [flowDirection]="flow"
+  ></flow-chart>
 </div>

@@ -22,8 +22,8 @@ export class FlowChartComponent implements OnChanges {
   @Input() heightEl: number;
   @Input() dinstanceElHorizontal = 40;
   @Input() dinstanceElVertical = 50;
-  @Input() direction = "vertical"; // horizontal | vertical
-  @Input() flowDirection = 2;
+  @Input() direction = "horizontal"; // horizontal | vertical
+  @Input() flowDirection = 1;
   @Input() adjustOnChange = true;
   @Input() canvasWidth = 500;
   @Input() canvasHeight: any = 500;
@@ -70,6 +70,17 @@ export class FlowChartComponent implements OnChanges {
 
   setupChart() {
     this._content = [...this.content];
+
+    this._content.forEach(i => {
+      delete i.index;
+      delete i.posX;
+      delete i.posY;
+      delete i.parent;
+      delete i.children;
+      delete i.childIndex;
+      delete i.width;
+      delete i.height;
+    });
 
     this._content.sort((a, b) => {
       return a.nextId - b.nextId;
